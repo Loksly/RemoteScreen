@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" >
+  <head>
+		<meta charset="utf-8" />
+    <title>Screen</title>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <style>
+			*{ margin:0; padding:0; }
+			body {
+				background-color:#bababa;
+				color:#fff;
+				font:14px/1.3 Arial,sans-serif;
+				overflow:hidden;
+				width:100%;
+				height:100%;
+			}
+			header{
+				max-width:90%;
+				width:90%;
+				height:95%;
+				margin-top:2%;
+				margin-left:5%;
+				white-space:nowrap;
+				text-align:center;
+			}
+			.text { width:100px;  }
+			.audio{ display:none; }
+    </style>
+  </head>
+  <body>
+		<header id="header">
+		  <span class="text" id="text"></span>
+	  </header>
+	  <div class="audio" id="audio"></div>
+		<script type="text/javascript">
+		"use strict";
+		function playsound(mp3)	{	audio.innerHTML = '<audio controls autoplay><source src="' + mp3 +'" type="audio/mpeg" /></audio>';	}
+		function resize()	{
+			var heightcontainer = window.document.documentElement.clientHeight*0.9;
+			var widthcontainer = window.document.documentElement.clientWidth * 0.9;
+			var fontSize  = (window.getComputedStyle(text, null).getPropertyCSSValue("font-size").cssText).replace('px','');
+			var fontwidthsize = fontSize * (widthcontainer / text.offsetWidth );
+			var fontheightsize = fontSize * (heightcontainer / text.offsetHeight );
+			text.style.fontSize = Math.min(fontwidthsize,fontheightsize, 300) +'px';
+		}
+		window.onresize=function(){ resize(); };
+		function focus(txt)	{
+			text.innerHTML = txt;
+			resize();
+		}
+
+		function setListener(notifier) {
+			var url = notifier + location.search;
+			var source = new EventSource(url);
+			source.onmessage = function(event) {
+				if (event.data){
+					var data = JSON.parse(event.data);
+					if (data.message)
+						focus(data.message);
+					if (data.sound)
+						playsound(data.sound);
+				}
+			};
+			source.addEventListener('error', function(e) {
+				if (e.readyState == EventSource.CLOSED) {
+					setListener(notifier); /* this is done to try to recover from an error */
+				}
+			}, false);
+		}
+		var text = document.getElementById('text');
+		var header = document.getElementById('header');
+		var audio = document.getElementById('audio');
+		var notifier = 'notify.php';
+		/* DANGER, IMPORTANT ISSUE: Realize that this address should be trusted since no filtering
+			is performed against possible XSS attacks. Note the message can contain scripts. */
+	
+		if(typeof(EventSource) !== "undefined" ) {
+			setListener(notifier);
+		}else{
+			console.log('Events are not available');
+		}
+		</script>
+	</body>
+</html>
