@@ -4,8 +4,8 @@
 		
 	session_start();
 
-	define ('PREFIX', sys_get_temp_dir().DIRECTORY_SEPARATOR.'notify_');
-	define ('SUFFIX','.txt');
+	define ('PREFIX', sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'notify_');
+	define ('SUFFIX', '.txt');
 	
 	$hashfunction = 'md5'; /* depending on the kind of channels you may use intval, md5, sha1 or whatever you want */
 
@@ -14,23 +14,22 @@
 	
 	$file = PREFIX. $channel. SUFFIX;
 	
-	if (isset($_SERVER['HTTP_ACCEPT']) && trim($_SERVER['HTTP_ACCEPT'])=='text/event-stream')
-	{
+	if (isset($_SERVER['HTTP_ACCEPT']) && trim($_SERVER['HTTP_ACCEPT']) === 'text/event-stream'){
 		header('Content-Type: text/event-stream');
 		header('Cache-Control: no-cache');
 
 		if (file_exists($file))
 		{
 			$contents = file_get_contents($file);
-			!isset($_SESSION['previous_'.$channel]) && $_SESSION['previous_'.$channel]='';
-			if ($contents!='' && $contents!=$_SESSION['previous_'.$channel])
-			{
-				echo "data: ".$contents."\n\n";
+			!isset($_SESSION['previous_'.$channel]) && $_SESSION['previous_' . $channel] = '';
+			if ($contents !== '' && ($contents !== $_SESSION['previous_' . $channel])){
+				echo "data: " . $contents . "\n\n";
 				flush();
 			}
+
 			$_SESSION['previous_'.$channel] = $contents;
 		}
-	}else{
+	} else {
 		$params = $_REQUEST;
 		unset($params['channel']);
 /*

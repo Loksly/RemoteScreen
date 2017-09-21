@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" >
-  <head>
+	<head>
 		<meta charset="utf-8" />
-    <title>Screen</title>
+		<title>Screen</title>
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <style>
-			*{ margin:0; padding:0; }
+		<style>
+			* { margin:0; padding:0; }
 			body {
 				background-color:#bababa;
 				color:#fff;
@@ -15,7 +15,7 @@
 				width:100%;
 				height:100%;
 			}
-			header{
+			header {
 				max-width:90%;
 				width:90%;
 				height:95%;
@@ -25,26 +25,26 @@
 				text-align:center;
 			}
 			.text { width:100px;  }
-			.audio{ display:none; }
-    </style>
-  </head>
-  <body>
+			.audio { display:none; }
+		</style>
+	</head>
+	<body>
 		<header id="header">
-		  <span class="text" id="text"></span>
-	  </header>
-	  <div class="audio" id="audio"></div>
+			<span class="text" id="text"></span>
+		</header>
+		<div class="audio" id="audio"></div>
 		<script type="text/javascript">
 		"use strict";
-		function playsound(mp3)	{	audio.innerHTML = '<audio controls autoplay><source src="' + mp3 +'" type="audio/mpeg" /></audio>';	}
-		function resize()	{
-			var heightcontainer = window.document.documentElement.clientHeight*0.9;
+		function playsound(mp3){ audio.innerHTML = '<audio controls autoplay><source src="' + mp3 +'" type="audio/mpeg" /></audio>'; }
+		function resize(){
+			var heightcontainer = window.document.documentElement.clientHeight * 0.9;
 			var widthcontainer = window.document.documentElement.clientWidth * 0.9;
-			var fontSize  = (window.getComputedStyle(text, null).getPropertyCSSValue("font-size").cssText).replace('px','');
-			var fontwidthsize = fontSize * (widthcontainer / text.offsetWidth );
-			var fontheightsize = fontSize * (heightcontainer / text.offsetHeight );
-			text.style.fontSize = Math.min(fontwidthsize,fontheightsize, 300) +'px';
+			var fontSize  = (window.getComputedStyle(text, null).getPropertyCSSValue("font-size").cssText).replace('px', '');
+			var fontwidthsize = fontSize * (widthcontainer / text.offsetWidth);
+			var fontheightsize = fontSize * (heightcontainer / text.offsetHeight);
+			text.style.fontSize = Math.min(fontwidthsize,fontheightsize, 300) + 'px';
 		}
-		window.onresize=function(){ resize(); };
+		window.onresize = function(){ resize(); };
 		function focus(txt)	{
 			text.innerHTML = txt;
 			resize();
@@ -55,11 +55,15 @@
 			var source = new EventSource(url);
 			source.onmessage = function(event) {
 				if (event.data){
-					var data = JSON.parse(event.data);
-					if (data.message)
-						focus(data.message);
-					if (data.sound)
-						playsound(data.sound);
+					try{
+						var data = JSON.parse(event.data);
+						if (data.message)
+							focus(data.message);
+						if (data.sound)
+							playsound(data.sound);
+					}catch(e){
+						console.error(e);
+					}
 				}
 			};
 			source.addEventListener('error', function(e) {
@@ -77,8 +81,8 @@
 	
 		if(typeof(EventSource) !== "undefined" ) {
 			setListener(notifier);
-		}else{
-			console.log('Events are not available');
+		} else {
+			console.error('Events are not available');
 		}
 		</script>
 	</body>
